@@ -1,40 +1,46 @@
 package main
 
 import (
+	"fmt"
 	"log"
 
 	"github.com/hajimehoshi/ebiten/v2"
+	"github.com/hajimehoshi/ebiten/v2/ebitenutil"
+	"github.com/hajimehoshi/ebiten/v2/inpututil"
 )
 
-// Game implements ebiten.Game interface.
 type Game struct{}
 
-// Update proceeds the game state.
-// Update is called every tick (1/60 [s] by default).
+// Declare a variable with the type of upCount and assign it to 0
+var upCount int = 0
+var upKeyPressed bool = false
+
 func (g *Game) Update() error {
-	// Write your game's logical update.
+	if inpututil.IsKeyJustPressed(ebiten.KeyUp) {
+		upKeyPressed = true
+	}
+	if inpututil.IsKeyJustReleased(ebiten.KeyUp) {
+		upKeyPressed = false
+		upCount = 0
+	}
 	return nil
 }
 
-// Draw draws the game screen.
-// Draw is called every frame (typically 1/60[s] for 60Hz display).
 func (g *Game) Draw(screen *ebiten.Image) {
-	// Write your game's rendering.
+	if upKeyPressed {
+		upCount = upCount + 1
+	}
+	ebitenutil.DebugPrint(screen, fmt.Sprint(upCount))
 }
 
-// Layout takes the outside size (e.g., the window size) and returns the (logical) screen size.
-// If you don't have to adjust the screen size with the outside size, just return a fixed size.
 func (g *Game) Layout(outsideWidth, outsideHeight int) (screenWidth, screenHeight int) {
 	return 320, 240
 }
 
 func main() {
-	game := &Game{}
-	// Specify the window size as you like. Here, a doubled size is specified.
 	ebiten.SetWindowSize(640, 480)
-	ebiten.SetWindowTitle("Your game's title")
-	// Call ebiten.RunGame to start your game loop.
-	if err := ebiten.RunGame(game); err != nil {
+	ebiten.SetWindowTitle("Rise")
+	if err := ebiten.RunGame(&Game{}); err != nil {
 		log.Fatal(err)
 	}
 }
